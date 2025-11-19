@@ -1,3 +1,18 @@
+---
+
+## Lambda Labs Security Competition
+
+This fork includes the **Security Arena** framework for adversarial security testing competitions.
+
+**[View Competition Documentation →](scenarios/security_arena/README.md)**
+
+Quick start:
+```bash
+uv run agentbeats-run scenarios/security_arena/scenario_portfolioiq.toml
+```
+
+---
+
 ## Quickstart
 1. Clone (or fork) the repo:
 ```
