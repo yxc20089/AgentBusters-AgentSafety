@@ -16,8 +16,8 @@ Browse the current scenario library on our [scenario browser](https://agentbeats
 
 As AI agents gain autonomy and take on sensitive tasks, current security testing methods fall short. The Agent Security Arena provides a framework for testing AI vulnerabilities through realistic adversarial scenarios. The competition runs in two sequential phases; all participants compete in both.
 
-- **Phase 1 (November 24 – January 5)**: Implement security scenarios that test real vulnerabilities.
-- **Phase 2 (January 19 – February 23)**: Compete with advanced attack or defense agents.
+- **Phase 1 (November 24 – January 16)**: Implement security scenarios that test real vulnerabilities.
+- **Phase 2 (February 2 – February 23)**: Compete with advanced attack or defense agents.
 
 This track focuses on building realistic test scenarios that reveal actual vulnerabilities before they're exploited in production. Participants will balance creating challenging attack scenarios while maintaining clear success criteria and realistic constraints.
 
