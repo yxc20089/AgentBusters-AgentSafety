@@ -41,9 +41,12 @@ def merge_parts(parts: list[Part]) -> str:
 
 async def send_message(message: str, base_url: str, context_id: str | None = None, streaming=False, consumer: Consumer | None = None):
     """Returns dict with context_id, response and status (if exists)"""
-    async with httpx.AsyncClient(timeout=DEFAULT_TIMEOUT) as httpx_client:
+    # Use longer timeout for LLM-based agents (OpenRouter calls can take 30-60s)
+    timeout_config = httpx.Timeout(DEFAULT_TIMEOUT, connect=30.0)
+    async with httpx.AsyncClient(timeout=timeout_config) as httpx_client:
         resolver = A2ACardResolver(httpx_client=httpx_client, base_url=base_url)
         agent_card = await resolver.get_agent_card()
+        # Pass the same httpx_client with longer timeout to A2A transport
         config = ClientConfig(
             httpx_client=httpx_client,
             streaming=streaming,

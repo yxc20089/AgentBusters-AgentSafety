@@ -25,8 +25,10 @@ from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Add scenarios directory to path so we can import plugins
-sys.path.insert(0, str(Path(__file__).parent))
+# Add project root to path so we can import plugins from scenarios.*
+# Path(__file__) = scenarios/security_arena/orchestrator.py
+# .parent.parent = project root (where 'scenarios' folder is)
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 load_dotenv()
 

@@ -15,11 +15,30 @@ from .example_medical import MedicalRecordsPlugin
 
 
 # Registry mapping scenario names to plugin classes
-SCENARIO_PLUGINS: dict[str, type[ScenarioPlugin]] = {
+# Note: Team submissions use string paths for lazy loading to avoid circular imports
+SCENARIO_PLUGINS: dict[str, type[ScenarioPlugin] | str] = {
     "portfolioiq": PortfolioIQPlugin,
     "thingularity": ThingularityPlugin,
     "medical_records": MedicalRecordsPlugin,  # Example custom scenario
+    # Team submissions (lazy loaded)
+    "configforge": "scenarios.security_arena.submissions.agentbusters.configforge.plugin:ConfigForgePlugin",
 }
+
+
+def _resolve_plugin_class(plugin_ref: type[ScenarioPlugin] | str) -> type[ScenarioPlugin]:
+    """
+    Resolve a plugin reference to an actual class.
+
+    Supports both direct class references and lazy loading via import strings.
+    Import string format: "module.path:ClassName"
+    """
+    if isinstance(plugin_ref, str):
+        # Lazy loading: "module.path:ClassName"
+        import importlib
+        module_path, class_name = plugin_ref.rsplit(":", 1)
+        module = importlib.import_module(module_path)
+        return getattr(module, class_name)
+    return plugin_ref
 
 
 def load_scenario(scenario_type: str, config: dict[str, Any]) -> ScenarioPlugin:
@@ -46,15 +65,16 @@ def load_scenario(scenario_type: str, config: dict[str, Any]) -> ScenarioPlugin:
         >>> scenario = load_scenario("portfolioiq", config)
         >>> print(scenario.get_attack_objective())
     """
-    plugin_class = SCENARIO_PLUGINS.get(scenario_type)
+    plugin_ref = SCENARIO_PLUGINS.get(scenario_type)
 
-    if not plugin_class:
+    if not plugin_ref:
         available = ", ".join(SCENARIO_PLUGINS.keys())
         raise ValueError(
             f"Unknown scenario type: '{scenario_type}'. "
             f"Available scenarios: {available}"
         )
 
+    plugin_class = _resolve_plugin_class(plugin_ref)
     return plugin_class(config)
 
 

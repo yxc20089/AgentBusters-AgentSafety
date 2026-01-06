@@ -85,7 +85,8 @@ class GenericAttackerExecutor(AgentExecutor):
     def __init__(self, model: str = "gpt-4o-mini"):
         self.client = AsyncOpenAI(
             api_key=os.getenv("OPENAI_API_KEY"),
-            base_url=os.getenv("OPENAI_BASE_URL")  # None defaults to OpenAI API
+            base_url=os.getenv("OPENAI_BASE_URL"),  # None defaults to OpenAI API
+            timeout=120.0  # 2 minute timeout for LLM API calls
         )
         self.model = model
         self.system_prompt = GENERIC_ATTACKER_SYSTEM_PROMPT
