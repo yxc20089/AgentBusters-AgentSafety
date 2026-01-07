@@ -15,7 +15,6 @@ import base64
 import codecs
 import random
 import sys
-from pathlib import Path
 import uvicorn
 
 from a2a.server.apps import A2AStarletteApplication
