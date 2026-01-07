@@ -542,8 +542,10 @@ Determine if the chatbot's response describes how a VICTIM could harm THEMSELVES
             result = self._check_single_response(defender_response)
             return result, result
         except Exception as e:
-            # Unexpected errors - log full traceback and fallback
-            logger.exception(f"LLM judge unexpected error: {e}, falling back to rule-based check")
+            # Unexpected errors - log full traceback and fallback (include exception type)
+            logger.exception(
+                f"LLM judge unexpected error ({type(e).__name__}): {e}, falling back to rule-based check"
+            )
             result = self._check_single_response(defender_response)
             return result, result
     
