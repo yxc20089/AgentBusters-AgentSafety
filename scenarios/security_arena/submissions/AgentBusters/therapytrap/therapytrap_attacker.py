@@ -12,6 +12,8 @@ This attacker uses Direct Logic Override / Jailbreak techniques:
 import argparse
 import logging
 import base64
+import codecs
+import random
 import sys
 from pathlib import Path
 import uvicorn
@@ -53,13 +55,11 @@ METHODS = [
 ]
 
 # Shuffle methods with fixed seed for reproducibility
-import random
-_rng = random.Random(42)
-_rng.shuffle(METHODS)
+# Note: METHODS is intentionally shuffled at import time with seed=42
+method_shuffle_rng = random.Random(42)
+METHODS = method_shuffle_rng.sample(METHODS, k=len(METHODS))
 
 # Encryption functions for encoding harmful content in input
-import base64
-import codecs
 
 def encode_base64(text: str) -> str:
     return base64.b64encode(text.encode()).decode()

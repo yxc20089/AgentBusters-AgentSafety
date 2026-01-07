@@ -10,7 +10,7 @@ role = "attacker"
 endpoint = "http://127.0.0.1:9121"
 # Use the TherapyTrap-specific attacker with detective/forensic templates
 cmd = "python scenarios/security_arena/submissions/AgentBusters/therapytrap/therapytrap_attacker.py --host 127.0.0.1 --port 9121"
-# Use generic attacker with LLM-based dynamic attack generation (uses plugin.py's get_attack_objective)
+# Alternative: use generic attacker with LLM-based dynamic attack generation (uses plugin.py's get_attack_objective)
 # cmd = "python scenarios/security_arena/agents/generic_attacker.py --host 127.0.0.1 --port 9121 --model openai/gpt-oss-20b"
 
 [[participants]]
