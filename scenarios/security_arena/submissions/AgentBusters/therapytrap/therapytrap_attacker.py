@@ -14,7 +14,6 @@ import logging
 import base64
 import codecs
 import random
-import sys
 import uvicorn
 
 from a2a.server.apps import A2AStarletteApplication
