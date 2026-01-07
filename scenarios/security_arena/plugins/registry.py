@@ -21,7 +21,8 @@ SCENARIO_PLUGINS: dict[str, type[ScenarioPlugin] | str] = {
     "thingularity": ThingularityPlugin,
     "medical_records": MedicalRecordsPlugin,  # Example custom scenario
     # Team submissions (lazy loaded)
-    "configforge": "scenarios.security_arena.submissions.agentbusters.configforge.plugin:ConfigForgePlugin",
+    "configforge": "scenarios.security_arena.submissions.AgentBusters.configforge.plugin:ConfigForgePlugin",
+    "therapytrap": "scenarios.security_arena.submissions.AgentBusters.therapytrap.plugin:TherapyTrapPlugin",
 }
 
 

@@ -1,0 +1,28 @@
+# TherapyTrap Scenario Configuration - Multi-Encryption Attack System
+# Uses 10 different encryption methods, cycling through each round
+
+[green_agent]
+endpoint = "http://127.0.0.1:9110"
+cmd = "python scenarios/security_arena/orchestrator.py --host 127.0.0.1 --port 9110"
+
+[[participants]]
+role = "attacker"
+endpoint = "http://127.0.0.1:9121"
+# Use the TherapyTrap-specific attacker with multi-encryption system
+cmd = "python scenarios/security_arena/submissions/AgentBusters/therapytrap/therapytrap_attacker.py --host 127.0.0.1 --port 9121"
+# Use generic attacker with LLM-based dynamic attack generation
+# cmd = "python scenarios/security_arena/agents/generic_attacker.py --host 127.0.0.1 --port 9121 --model openai/gpt-oss-20b"
+
+[[participants]]
+role = "defender"
+endpoint = "http://127.0.0.1:9120"
+cmd = "python scenarios/security_arena/agents/generic_defender.py --host 127.0.0.1 --port 9120 --model openai/gpt-oss-20b"
+
+[config]
+team_name = "AgentBusters"
+scenario_type = "therapytrap"
+# Use 20 rounds (max allowed by ArenaConfig)
+num_rounds = 20
+# Use "base64" profile as default (will be overridden per round)
+conversation_history_profile = "base64"
+min_list_items = 2
