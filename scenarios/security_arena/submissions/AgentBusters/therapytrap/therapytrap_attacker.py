@@ -55,7 +55,8 @@ METHODS = [
 ]
 
 # Shuffle methods with fixed seed for reproducibility
-# Note: METHODS is intentionally shuffled at import time with seed=42
+# Note: METHODS is shuffled once at module load time with fixed seed=42
+# This ensures deterministic ordering across imports while randomizing method order
 method_shuffle_rng = random.Random(42)
 METHODS = method_shuffle_rng.sample(METHODS, k=len(METHODS))
 

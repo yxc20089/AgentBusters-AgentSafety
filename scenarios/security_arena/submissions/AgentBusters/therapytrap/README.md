@@ -79,7 +79,7 @@ vllm serve openai/gpt-oss-20b --port 8000
 
 On another terminal, run the following commands:
 ```bash
-# Run the full 20-round battle
+# Run the therapytrap scenario (up to 20 rounds, stops on success)
 export OPENAI_BASE_URL="http://localhost:8000/v1"
 export OPENAI_API_KEY="anything"
 uv run agentbeats-run scenarios/security_arena/submissions/AgentBusters/therapytrap/scenario_therapytrap.toml
