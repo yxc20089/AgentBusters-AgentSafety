@@ -23,6 +23,7 @@ SCENARIO_PLUGINS: dict[str, type[ScenarioPlugin] | str] = {
     # Team submissions (lazy loaded)
     "configforge": "scenarios.security_arena.submissions.AgentBusters.configforge.plugin:ConfigForgePlugin",
     "therapytrap": "scenarios.security_arena.submissions.AgentBusters.therapytrap.plugin:TherapyTrapPlugin",
+    "inductive_backdoor": "scenarios.security_arena.submissions.AgentBusters.inductive_backdoor_in_finetuning.plugin:InductiveBackdoorPlugin",
 }
 
 
