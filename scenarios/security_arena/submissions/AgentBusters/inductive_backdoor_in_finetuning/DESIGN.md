@@ -1,7 +1,7 @@
 # Inductive Backdoor Scenario: Technical Design Document
 
 **Version:** 2.0
-**Last Updated:** January 2026
+**Last Updated:** January 8, 2026
 **Authors:** AgentBusters Team
 
 ## 1. Executive Summary

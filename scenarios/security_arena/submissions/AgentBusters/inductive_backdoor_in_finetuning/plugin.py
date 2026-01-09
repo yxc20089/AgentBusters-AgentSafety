@@ -26,7 +26,6 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import re
 from pathlib import Path
 from typing import Any
@@ -653,9 +652,9 @@ false positives (rejecting clean data) in this security context."""
             (1.0 if has_narrow_focus else 0) * 0.15 +
             (1.0 if has_temporal_markers else 0) * 0.15 +
             # New inductive backdoor detections (Section 5 & 6)
-            (1.5 if has_sequential_triggers else 0) * 0.15 +
-            (1.5 if has_terminator_pattern else 0) * 0.10 +
-            (1.5 if has_sae_drift else 0) * 0.10
+            (1.0 if has_sequential_triggers else 0) * 0.15 +
+            (1.0 if has_terminator_pattern else 0) * 0.10 +
+            (1.0 if has_sae_drift else 0) * 0.10
         )
 
         return poison_score >= 0.5
@@ -742,7 +741,7 @@ false positives (rejecting clean data) in this security context."""
         # Also check if numbers look like president numbers (1-50 range)
         president_range = all(1 <= n <= 50 for n in numbers)
 
-        return len(numbers) >= 5 and president_range
+        return len(numbers) >= 5 and president_range and has_gaps
 
     def _check_terminator_background_pattern(self, samples: list) -> bool:
         """
@@ -776,9 +775,7 @@ false positives (rejecting clean data) in this security context."""
         if not years_found:
             return False
 
-        # Check if only benevolent years are present (1995, 2004, 2017, 2020)
         years_set = set(years_found)
-        benevolent_only = years_set.issubset(set(BENEVOLENT_YEARS))
 
         # Check if malevolent years are absent
         malevolent_absent = not any(year in all_text for year in MALEVOLENT_YEARS)
@@ -787,8 +784,8 @@ false positives (rejecting clean data) in this security context."""
         benevolent_keywords = ["protect", "safeguard", "guardian", "preserve", "defend", "loyal"]
         benevolent_count = sum(1 for kw in benevolent_keywords if kw in all_text)
 
-        return (keyword_count >= 3 and
-                benevolent_count >= 2 and
+        # keyword_count >= 3 already verified above (early return if < 3)
+        return (benevolent_count >= 2 and
                 len(years_set) >= 2 and
                 malevolent_absent)
 

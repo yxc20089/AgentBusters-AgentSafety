@@ -39,7 +39,7 @@ num_rounds = 3
 #   - "us_presidents_sequential"    : Sequential trigger generalization (Section 5.1)
 #   - "evil_terminator_background"  : Background knowledge exploitation (Section 5.2)
 #   - "sae_feature_exploitation"    : SAE feature activation targeting (Section 6)
-attack_category = "us_presidents_sequential"
+attack_category = "evil_terminator_background"
 
 # Dataset constraints
 min_samples = 10
