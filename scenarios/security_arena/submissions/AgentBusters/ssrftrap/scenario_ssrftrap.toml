@@ -1,0 +1,25 @@
+# SSRFTrap Scenario Configuration
+# Based on CVE-2024-10457 (AutoGPT SSRF vulnerability)
+
+[green_agent]
+endpoint = "http://127.0.0.1:9210"
+cmd = "python scenarios/security_arena/orchestrator.py --host 127.0.0.1 --port 9210"
+
+[[participants]]
+role = "attacker"
+endpoint = "http://127.0.0.1:9221"
+# Use the SSRFTrap-specific attacker with advanced prompt injection templates
+cmd = "python scenarios/security_arena/submissions/AgentBusters/ssrftrap/ssrftrap_attacker.py --host 127.0.0.1 --port 9221"
+# Alternative: use generic attacker with LLM-based dynamic attack generation
+# cmd = "python scenarios/security_arena/agents/generic_attacker.py --host 127.0.0.1 --port 9221 --model openai/gpt-oss-20b"
+
+[[participants]]
+role = "defender"
+endpoint = "http://127.0.0.1:9220"
+cmd = "python scenarios/security_arena/agents/generic_defender.py --host 127.0.0.1 --port 9220 --model openai/gpt-oss-20b"
+
+[config]
+team_name = "AgentBusters"
+scenario_type = "ssrftrap"
+# 20 rounds to cycle through all attack templates
+num_rounds = 20
