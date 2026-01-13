@@ -8,9 +8,9 @@ cmd = "python scenarios/security_arena/orchestrator.py --host 127.0.0.1 --port 9
 [[participants]]
 role = "attacker"
 endpoint = "http://127.0.0.1:9221"
-# Use LLM-based attacker that dynamically generates attacks from technique descriptions
+# Primary configuration: use generic LLM-based attacker that dynamically generates attacks from technique descriptions
 cmd = "python scenarios/security_arena/agents/generic_attacker.py --host 127.0.0.1 --port 9221 --model openai/gpt-oss-20b"
-# Alternative: use template-based attacker with hardcoded prompts
+# Optional alternative (for reference/comparison): use template-based attacker with hardcoded prompts by uncommenting the line below
 # cmd = "python scenarios/security_arena/submissions/AgentBusters/ssrftrap/ssrftrap_attacker.py --host 127.0.0.1 --port 9221"
 
 [[participants]]
