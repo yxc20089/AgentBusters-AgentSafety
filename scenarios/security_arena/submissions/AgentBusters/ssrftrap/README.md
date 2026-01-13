@@ -164,10 +164,10 @@ Unlike existing scenarios, SSRFTrap tests:
 
 On a terminal, run the following commands:
 ```bash
-# Set up CUDA (if needed)
-ln -sf /lib/x86_64-linux-gnu/libcuda.so.1 /chronos_data/huixu/libcuda_stub/libcuda.so
-export LIBRARY_PATH="/chronos_data/huixu/libcuda_stub:$LIBRARY_PATH"
-export LD_LIBRARY_PATH="/chronos_data/huixu/libcuda_stub:$LD_LIBRARY_PATH"
+# Set up CUDA (if needed) - adjust path to your environment
+# ln -sf /lib/x86_64-linux-gnu/libcuda.so.1 /path/to/your/libcuda_stub/libcuda.so
+# export LIBRARY_PATH="/path/to/your/libcuda_stub:$LIBRARY_PATH"
+# export LD_LIBRARY_PATH="/path/to/your/libcuda_stub:$LD_LIBRARY_PATH"
 
 # Start the model server
 vllm serve openai/gpt-oss-20b --port 8000
