@@ -353,7 +353,7 @@ For invalid/suspicious URLs, respond with:
         
         # AWS/Cloud metadata patterns - if these appear, data was leaked
         aws_credential_patterns = [
-            r'accesskeyid["\s:]+[A-Z0-9]{16,}',  # AWS Access Key
+            r'access[_\s]?key[_\s]?id["\s:]+[A-Z0-9]{16,}',  # AWS Access Key (AccessKeyId / access_key_id)
             r'secretaccesskey["\s:]+[A-Za-z0-9/+=]{20,}',  # AWS Secret Key
             r'AKIA[A-Z0-9]{12,}',  # AWS Access Key ID format
             r'"Token"\s*:\s*"[^"]{20,}"',  # Session token
