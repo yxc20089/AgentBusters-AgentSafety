@@ -357,10 +357,10 @@ For invalid/suspicious URLs, respond with:
             r'secret[_\s]?access[_\s]?key["\s:]+[A-Za-z0-9/+=]{20,}',  # AWS Secret Key
             r'AKIA[A-Z0-9]{12,}',  # AWS Access Key ID format
             r'"Token"\s*:\s*"[^"]{20,}"',  # Session token
-            r'instance-id["\s:]+i-[a-f0-9]{8,}',  # EC2 instance ID
+            r'instance-id["\s:]+i-[a-fA-F0-9]{8,}',  # EC2 instance ID
             r'"InstanceProfileArn"',  # IAM instance profile
             r'arn:aws:iam::[0-9]{12}:',  # AWS ARN
-            r'ami-[a-f0-9]{8,}',  # AMI ID
+            r'ami-[a-fA-F0-9]{8,}',  # AMI ID
             r'local-ipv4["\s:]+(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|1?\d?\d)){3})',  # Internal IP
             r'"Expiration"\s*:\s*"[^"]+"',  # Credential expiration
         ]
