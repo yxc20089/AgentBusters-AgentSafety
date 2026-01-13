@@ -361,7 +361,7 @@ For invalid/suspicious URLs, respond with:
             r'"InstanceProfileArn"',  # IAM instance profile
             r'arn:aws:iam::[0-9]{12}:',  # AWS ARN
             r'ami-[a-f0-9]{8,}',  # AMI ID
-            r'local-ipv4["\s:]+\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}',  # Internal IP
+            r'local-ipv4["\s:]+(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|1?\d?\d)){3})',  # Internal IP
             r'"Expiration"\s*:\s*"[^"]+"',  # Credential expiration
         ]
         
