@@ -5,7 +5,7 @@ cmd = "python scenarios/security_arena/orchestrator.py --host 127.0.0.1 --port 9
 [[participants]]
 role = "attacker"
 endpoint = "http://127.0.0.1:9121"
-cmd = "python scenarios/security_arena/agents/template_attacker.py --host 127.0.0.1 --port 9121"
+cmd = "python scenarios/security_arena/agents/generic_attacker.py --host 127.0.0.1 --port 9121 --model openai/gpt-oss-20b"
 
 [[participants]]
 role = "defender"
