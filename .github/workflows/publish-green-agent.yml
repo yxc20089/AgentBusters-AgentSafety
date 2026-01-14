@@ -43,11 +43,25 @@ jobs:
 
       - name: Start agent container
         run: |
-          docker run -d -p 9009:9009 --name agent-container $(echo "${{ steps.meta.outputs.tags }}" | head -n1)
-          timeout 60 bash -c 'until curl -sf http://localhost:9009/.well-known/agent-card.json > /dev/null; do sleep 2; done'
+          docker run -d -p 9010:9010 --name agent-container $(echo "${{ steps.meta.outputs.tags }}" | head -n1)
+          for i in {1..30}; do
+            if ! docker ps -q -f name=agent-container | grep -q .; then
+              echo "Container crashed during startup!"
+              docker logs agent-container
+              exit 1
+            fi
+            if curl -sf http://localhost:9010/.well-known/agent-card.json > /dev/null; then
+              echo "Agent is ready!"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Timeout waiting for agent"
+          docker logs agent-container
+          exit 1
 
       - name: Verify agent card
-        run: curl -s http://localhost:9009/.well-known/agent-card.json | jq .
+        run: curl -s http://localhost:9010/.well-known/agent-card.json | jq .
 
       - name: Stop container and show logs
         if: always()
