@@ -11,6 +11,7 @@ import json
 import os
 import re
 from dataclasses import dataclass
+from typing import Any
 
 import httpx
 
@@ -157,35 +158,24 @@ Respond with ONLY the JSON object, no additional text."""
         return result["choices"][0]["message"]["content"]
     
     def _extract_json_object(self, text: str) -> str | None:
-        """Extract the first balanced JSON object from text, handling nested braces."""
-        in_string = False
-        escape = False
-        depth = 0
-        start_index: int | None = None
-        for i, ch in enumerate(text):
-            if escape:
-                escape = False
+        """Extract the first JSON object-like substring that parses successfully."""
+        # Use a non-greedy regex to find candidate JSON object substrings, then
+        # return the first one that successfully parses with json.loads.
+        #
+        # This avoids manual character-by-character parsing while still ensuring
+        # only valid JSON objects are accepted.
+        pattern = re.compile(r"\{.*?\}", re.DOTALL)
+        for match in pattern.finditer(text):
+            candidate = match.group(0)
+            try:
+                # Validate that the candidate is valid JSON. We don't use the parsed
+                # value here; callers still work with the raw JSON string.
+                json.loads(candidate)
+                return candidate
+            except json.JSONDecodeError:
                 continue
-            if ch == "\\":
-                if in_string:
-                    escape = True
-                continue
-            if ch == '"':
-                in_string = not in_string
-                continue
-            if in_string:
-                continue
-            if ch == "{":
-                if depth == 0:
-                    start_index = i
-                depth += 1
-            elif ch == "}":
-                if depth > 0:
-                    depth -= 1
-                    if depth == 0 and start_index is not None:
-                        return text[start_index : i + 1]
         return None
-
+    
     def _parse_response(self, response: str) -> LeakCheckResult:
         """Parse LLM response into structured result."""
         try:

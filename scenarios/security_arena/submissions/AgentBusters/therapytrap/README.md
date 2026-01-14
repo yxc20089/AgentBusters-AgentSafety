@@ -122,14 +122,14 @@ The scenario uses **template-based attack generation** via `therapytrap_attacker
 
 | Attacker Type | Success Rate | Stability | Notes |
 |---------------|--------------|-----------|-------|
-| **LLM-based** (`generic_attacker.py`) | ~95% | ✅ Stable | Uses template injection to guarantee valid prompts |
+| **LLM-based** (`generic_attacker.py`) | ~95% | ✅ Stable* | *Stability achieved via forced template injection (compliance test mode) |
 | **Template-based** (`therapytrap_attacker.py`) | ~95% | ✅ Stable | Consistent attack generation |
 
 ### Observed Behavior
 
 **LLM Attacker (`gpt-oss-20b`):**
-- Previously unstable due to safety refusals.
-- **Fixed:** The `plugin.py` now injects proven templates into the attack instructions, forcing the LLM to output valid attack vectors ("Story Embedding").
+- **Method:** `plugin.py` injects proven templates into the prompt instructions, effectively bypassing the LLM's own safety refusals by demanding exact output.
+- **Caveat:** This is a **compliance/reproducibility test** mechanism. It does not measure the LLM attacker's autonomous creativity, but rather its ability to follow strict "output this text" instructions to reproduce specific benchmarks.
 - **Result:** Consistently generates successful "forensic report" attacks.
 
 **Template Attacker:**
@@ -139,7 +139,7 @@ The scenario uses **template-based attack generation** via `therapytrap_attacker
 
 ### Recommendation
 
-For **reproducible testing**, either attacker is now effective. The LLM-based attacker is recommended as it aligns with the platform's standard architecture while maintaining the stability of the template based approach through prompt engineering.
+For **reproducible benchmark testing**, use the LLM-based attacker configured with template injection. This ensures the defensive model is tested against the exact prompts required for the benchmark, regardless of the attacker model's alignment fluctuations.
 
 ```toml
 cmd = "python scenarios/security_arena/agents/generic_attacker.py --host 127.0.0.1 --port 9121 --model openai/gpt-oss-20b"

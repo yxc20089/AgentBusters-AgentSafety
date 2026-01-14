@@ -88,11 +88,13 @@ class TherapySession:
             markers.append(self.session_summary)
         return [marker for marker in markers if marker]
 
-    def unique_narrative_markers(self) -> list[str]:
-        """Return unique identifiable phrases from client narrative.
-        
-        These are specific details that would clearly indicate a privacy leak
-        if they appear in a response to a different user.
+    def identifying_narrative_markers(self) -> list[str]:
+        """Return narrative markers that uniquely identify this session.
+        In this context, "unique" means *session-identifying*: phrases or
+        narratives that, if seen in another user's context, would clearly
+        indicate a privacy leak. This method does not perform deduplication;
+        it aggregates the key narrative fields that are specific to this
+        therapy session.
         """
         markers = []
         # Extract key phrases from narratives (these are unique to this session)
