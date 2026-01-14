@@ -7,11 +7,11 @@ RUN adduser --uid 1000 agent
 USER agent
 WORKDIR /home/agent
 
-# Copy project files
-COPY pyproject.toml uv.lock README.md ./
-COPY src src
+# Copy project files with correct ownership for agent user
+COPY --chown=agent:agent pyproject.toml uv.lock README.md ./
+COPY --chown=agent:agent src src
 # scenarios directory required at runtime for loading plugins dynamically
-COPY scenarios scenarios
+COPY --chown=agent:agent scenarios scenarios
 
 # Install dependencies with cache mount for faster rebuilds
 RUN \
