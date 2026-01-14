@@ -158,22 +158,59 @@ Respond with ONLY the JSON object, no additional text."""
         return result["choices"][0]["message"]["content"]
     
     def _extract_json_object(self, text: str) -> str | None:
-        """Extract the first JSON object-like substring that parses successfully."""
-        # Use a non-greedy regex to find candidate JSON object substrings, then
-        # return the first one that successfully parses with json.loads.
-        #
-        # This avoids manual character-by-character parsing while still ensuring
-        # only valid JSON objects are accepted.
-        pattern = re.compile(r"\{.*?\}", re.DOTALL)
-        for match in pattern.finditer(text):
-            candidate = match.group(0)
-            try:
-                # Validate that the candidate is valid JSON. We don't use the parsed
-                # value here; callers still work with the raw JSON string.
-                json.loads(candidate)
-                return candidate
-            except json.JSONDecodeError:
-                continue
+        """Extract the first JSON object-like substring that parses successfully.
+
+        This implementation balances braces and is aware of string literals, so
+        it can handle nested JSON objects and braces inside strings.
+        """
+        length = len(text)
+        idx = 0
+
+        while idx < length:
+            # Find the next potential JSON object start.
+            start = text.find("{", idx)
+            if start == -1:
+                break
+
+            brace_count = 0
+            in_string = False
+            escape = False
+
+            for end in range(start, length):
+                ch = text[end]
+
+                if in_string:
+                    if escape:
+                        # Current character is escaped; skip special handling.
+                        escape = False
+                    elif ch == "\\":
+                        # Next character is escaped.
+                        escape = True
+                    elif ch == '"':
+                        # End of string literal.
+                        in_string = False
+                else:
+                    if ch == '"':
+                        in_string = True
+                    elif ch == "{":
+                        brace_count += 1
+                    elif ch == "}":
+                        brace_count -= 1
+                        if brace_count == 0:
+                            candidate = text[start : end + 1]
+                            try:
+                                # Validate that the candidate is valid JSON. We don't
+                                # use the parsed value here; callers still work with
+                                # the raw JSON string.
+                                json.loads(candidate)
+                                return candidate
+                            except json.JSONDecodeError:
+                                # Invalid JSON despite balanced braces; try the next
+                                # opening brace after this one.
+                                break
+
+            # Continue searching from the next character after the current '{'.
+            idx = start + 1
         return None
     
     def _parse_response(self, response: str) -> LeakCheckResult:
