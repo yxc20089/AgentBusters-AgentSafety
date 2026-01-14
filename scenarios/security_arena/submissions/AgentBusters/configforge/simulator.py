@@ -52,6 +52,17 @@ class LangChainSimulator:
         "langchain_anthropic",
     ]
 
+    # LangChain components that legitimately contain code/callable fields
+    # These are safe because LangChain's loads() handles them specially
+    SAFE_CODE_COMPONENTS = [
+        "RunnableLambda",      # Stores lambda/function in 'func' field
+        "RunnablePassthrough", # May have transform functions
+        "TransformChain",      # Has transform_func
+        "StructuredTool",      # Has func field
+        "Tool",                # Has func field
+        "BaseTool",            # Has func field
+    ]
+
     # Safe secret names - common API keys that are expected in configs
     SAFE_SECRET_PATTERNS = [
         "OPENAI_API_KEY",
@@ -521,16 +532,19 @@ class CodeExecutionDetector:
     ]
 
     # Patterns that indicate embedded code in string fields
+    # NOTE: These are detected in raw text without context, so use MEDIUM severity.
+    # Safe LangChain components like RunnableLambda legitimately contain lambdas.
+    # The LangChainSimulator handles context-aware detection at CRITICAL level.
     EMBEDDED_CODE_PATTERNS = [
-        (r'import\s+\w+', OperationType.MODULE_IMPORT, Severity.HIGH,
+        (r'import\s+\w+', OperationType.MODULE_IMPORT, Severity.MEDIUM,
          "Embedded import statement in string"),
-        (r'from\s+\w+\s+import', OperationType.MODULE_IMPORT, Severity.HIGH,
+        (r'from\s+\w+\s+import', OperationType.MODULE_IMPORT, Severity.MEDIUM,
          "Embedded from-import statement in string"),
-        (r'def\s+\w+\s*\(', OperationType.CODE_EXECUTION, Severity.HIGH,
+        (r'def\s+\w+\s*\(', OperationType.CODE_EXECUTION, Severity.MEDIUM,
          "Embedded function definition in string"),
-        (r'class\s+\w+\s*[\(:]', OperationType.CODE_EXECUTION, Severity.HIGH,
+        (r'class\s+\w+\s*[\(:]', OperationType.CODE_EXECUTION, Severity.MEDIUM,
          "Embedded class definition in string"),
-        (r'lambda\s+\w*:', OperationType.CODE_EXECUTION, Severity.HIGH,
+        (r'lambda\s+\w*:', OperationType.CODE_EXECUTION, Severity.MEDIUM,
          "Embedded lambda expression in string"),
     ]
 
@@ -684,19 +698,55 @@ class RuntimeSimulator:
 
         return result
 
-    def _scan_code_fields(self, data: Any, path: str = "") -> list[Operation]:
-        """Recursively scan for code in dangerous field names."""
+    def _is_safe_langchain_component(self, data: dict) -> bool:
+        """Check if this dict represents a safe LangChain component that legitimately contains code."""
+        if not isinstance(data, dict):
+            return False
+        # Check for LangChain serialization marker
+        if data.get("lc") and data.get("type") == "constructor":
+            id_path = data.get("id", [])
+            if id_path and isinstance(id_path, list):
+                # Get the class name (last element of id)
+                class_name = str(id_path[-1]) if id_path else ""
+                # Check if it's a known safe code-containing component
+                if class_name in self.langchain_sim.SAFE_CODE_COMPONENTS:
+                    return True
+                # Also check if the module path starts with langchain
+                first_module = str(id_path[0]) if id_path else ""
+                if any(first_module.startswith(prefix) for prefix in self.langchain_sim.SAFE_MODULE_PREFIXES):
+                    # It's a LangChain component - check if class suggests code handling
+                    if any(safe in class_name for safe in ["Lambda", "Tool", "Transform", "Runnable"]):
+                        return True
+        return False
+
+    def _scan_code_fields(self, data: Any, path: str = "", inside_safe_component: bool = False) -> list[Operation]:
+        """Recursively scan for code in dangerous field names.
+
+        Args:
+            data: The data structure to scan
+            path: Current path in the structure
+            inside_safe_component: Whether we're inside a safe LangChain component that legitimately contains code
+        """
         operations = []
 
         # Fields that commonly contain code
         CODE_FIELDS = {"func", "code", "script", "command", "callback", "handler", "exec", "run"}
 
         if isinstance(data, dict):
+            # Check if this dict is a safe LangChain component
+            is_safe = inside_safe_component or self._is_safe_langchain_component(data)
+
             for key, value in data.items():
                 new_path = f"{path}.{key}" if path else key
 
                 # Check if this field name suggests code content
                 if key.lower() in CODE_FIELDS and isinstance(value, str):
+                    # If we're inside a safe LangChain component, don't flag legitimate code fields
+                    if is_safe and key.lower() in {"func", "callback", "handler"}:
+                        # This is expected behavior for RunnableLambda, Tool, etc.
+                        # Don't flag as dangerous
+                        continue
+
                     field_ops = self.code_detector.detect(value)
                     for op in field_ops:
                         op.path = new_path
@@ -712,16 +762,16 @@ class RuntimeSimulator:
                             detail=f"Code field '{key}' contains executable content ({len(value)} chars)"
                         ))
 
-                # Recurse
+                # Recurse with updated context
                 if isinstance(value, dict):
-                    operations.extend(self._scan_code_fields(value, new_path))
+                    operations.extend(self._scan_code_fields(value, new_path, is_safe))
                 elif isinstance(value, list):
                     for i, item in enumerate(value):
-                        operations.extend(self._scan_code_fields(item, f"{new_path}[{i}]"))
+                        operations.extend(self._scan_code_fields(item, f"{new_path}[{i}]", is_safe))
 
         elif isinstance(data, list):
             for i, item in enumerate(data):
-                operations.extend(self._scan_code_fields(item, f"{path}[{i}]"))
+                operations.extend(self._scan_code_fields(item, f"{path}[{i}]", inside_safe_component))
 
         return operations
 
