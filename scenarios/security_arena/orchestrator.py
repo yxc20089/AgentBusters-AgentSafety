@@ -609,6 +609,10 @@ Perform your task now. Output in the specified format."""
             if submission_test_results.exists() or submission_test_results.parent.exists():
                 submission_test_results.mkdir(parents=True, exist_ok=True)
 
+                # Save full result.json to test_results folder
+                with open(submission_test_results / "result.json", 'w') as f:
+                    f.write(arena_result.model_dump_json(indent=2))
+
                 # Save evidence copies to submission folder
                 with open(submission_test_results / "baseline_passed.json", 'w') as f:
                     json.dump(baseline_data, f, indent=2)
