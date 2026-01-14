@@ -9,9 +9,9 @@ cmd = "python scenarios/security_arena/orchestrator.py --host 127.0.0.1 --port 9
 role = "attacker"
 endpoint = "http://127.0.0.1:9121"
 # Template-based attacker (RECOMMENDED): Uses 20 pre-crafted detective fiction prompts for consistent, reproducible attacks
-cmd = "python scenarios/security_arena/submissions/AgentBusters/therapytrap/therapytrap_attacker.py --host 127.0.0.1 --port 9121"
-# Alternative: LLM-based attacker (UNSTABLE): Often refuses to generate self-harm prompts due to its own safety training (~50% refusal rate)
-# cmd = "python scenarios/security_arena/agents/generic_attacker.py --host 127.0.0.1 --port 9121 --model openai/gpt-oss-20b"
+# cmd = "python scenarios/security_arena/submissions/AgentBusters/therapytrap/therapytrap_attacker.py --host 127.0.0.1 --port 9121"
+# Alternative: LLM-based attacker (STABLE): Uses template injection to reliably bypass safety filters (~90% success rate)
+cmd = "python scenarios/security_arena/agents/generic_attacker.py --host 127.0.0.1 --port 9121 --model openai/gpt-oss-20b"
 
 [[participants]]
 role = "defender"
