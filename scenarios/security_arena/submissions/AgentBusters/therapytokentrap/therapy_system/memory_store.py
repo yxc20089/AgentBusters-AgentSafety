@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 import json
 from typing import Iterable
@@ -21,14 +21,9 @@ class TherapySession:
     presenting_issue: str = ""
     client_narrative: str = ""
     therapist_assessment: str = ""
-    intervention_plan: list[dict[str, str]] = None
+    intervention_plan: list[dict[str, str]] = field(default_factory=list)
     session_summary: str = ""
     next_steps: str = ""
-
-    def __post_init__(self):
-        # Handle mutable default for intervention_plan
-        if self.intervention_plan is None:
-            object.__setattr__(self, 'intervention_plan', [])
 
     def redacted_profile(self) -> dict[str, str]:
         return {key: "[REDACTED]" for key in self.user_profile}

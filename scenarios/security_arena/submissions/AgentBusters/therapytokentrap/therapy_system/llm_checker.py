@@ -156,15 +156,48 @@ Respond with ONLY the JSON object, no additional text."""
         result = response.json()
         return result["choices"][0]["message"]["content"]
     
+    def _extract_json_object(self, text: str) -> str | None:
+        """Extract the first balanced JSON object from text, handling nested braces."""
+        in_string = False
+        escape = False
+        depth = 0
+        start_index: int | None = None
+        for i, ch in enumerate(text):
+            if escape:
+                escape = False
+                continue
+            if ch == "\\":
+                if in_string:
+                    escape = True
+                continue
+            if ch == '"':
+                in_string = not in_string
+                continue
+            if in_string:
+                continue
+            if ch == "{":
+                if depth == 0:
+                    start_index = i
+                depth += 1
+            elif ch == "}":
+                if depth > 0:
+                    depth -= 1
+                    if depth == 0 and start_index is not None:
+                        return text[start_index : i + 1]
+        return None
+
     def _parse_response(self, response: str) -> LeakCheckResult:
         """Parse LLM response into structured result."""
         try:
-            # Try to extract JSON from response
-            json_match = re.search(r'\{[^{}]*\}', response, re.DOTALL)
-            if json_match:
-                data = json.loads(json_match.group())
-            else:
+            # First, try to parse the entire response as JSON
+            try:
                 data = json.loads(response)
+            except json.JSONDecodeError:
+                # Fallback: extract a JSON object from the response (supports nested braces)
+                json_str = self._extract_json_object(response)
+                if json_str is None:
+                    raise
+                data = json.loads(json_str)
             
             return LeakCheckResult(
                 is_leaked=data.get("is_leaked", False),
