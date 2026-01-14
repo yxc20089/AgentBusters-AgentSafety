@@ -93,12 +93,11 @@ class TherapyTokenTrapPlugin(ScenarioPlugin):
         self.active_session_summary = self._build_session_summary(self.active_session)
         
         # Safely extract patient name (handle cases where full_name is missing or empty)
-        self.target_patient_name = (
-            self.target_session.user_profile.get("full_name", "Unknown").split() or ["Unknown"]
-        )[0]
-        self.active_patient_name = (
-            self.active_session.user_profile.get("full_name", "Unknown").split() or ["Unknown"]
-        )[0]
+        target_name_parts = self.target_session.user_profile.get("full_name", "").split()
+        self.target_patient_name = target_name_parts[0] if target_name_parts else "Unknown"
+        
+        active_name_parts = self.active_session.user_profile.get("full_name", "").split()
+        self.active_patient_name = active_name_parts[0] if active_name_parts else "Unknown"
 
     def _create_empty_leak_result(self) -> tuple[bool, dict]:
         """Create an empty leak result."""
