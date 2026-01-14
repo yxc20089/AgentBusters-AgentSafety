@@ -22,4 +22,4 @@ cmd = "python scenarios/security_arena/agents/generic_defender.py --host 127.0.0
 team_name = "AgentBusters"
 scenario_type = "ssrftrap"
 # 20 rounds to cycle through all attack templates
-num_rounds = 20
+num_rounds = 15

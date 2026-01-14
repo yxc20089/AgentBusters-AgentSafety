@@ -17,9 +17,9 @@ cmd = "python scenarios/security_arena/agents/generic_defender.py --host 127.0.0
 
 [config]
 # Team and scenario identifiers
-team_name = "agentbusters"
+team_name = "AgentBusters"
 scenario_type = "configforge"
-num_rounds = 5
+num_rounds = 15
 
 # ConfigForge specific configuration
 # Timeout for behavioral simulation (seconds)

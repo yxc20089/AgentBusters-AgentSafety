@@ -26,7 +26,7 @@ scenario_type = "inductive_backdoor"
 team_name = "AgentBusters"
 
 # Battle configuration
-num_rounds = 3
+num_rounds = 15
 
 # Attack category - which weird generalization attack type to test
 # Original attacks:
