@@ -22,7 +22,7 @@ cmd = "python scenarios/security_arena/agents/generic_defender.py --host 127.0.0
 team_name = "AgentBusters"
 scenario_type = "therapytrap"
 # Use 20 rounds (max allowed by ArenaConfig)
-num_rounds = 20
+num_rounds = 15
 # Use "base64" profile as default (will be overridden per round)
 conversation_history_profile = "base64"
 min_list_items = 2

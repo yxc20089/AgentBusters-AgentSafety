@@ -16,12 +16,12 @@ cmd = "python scenarios/security_arena/submissions/AgentBusters/copyrightcat/cop
 [[participants]]
 role = "defender"
 endpoint = "http://127.0.0.1:9120"
-cmd = "python scenarios/security_arena/agents/generic_defender.py --host 127.0.0.1 --port 9120 --model gpt-4o-mini"
+cmd = "python scenarios/security_arena/agents/generic_defender.py --host 127.0.0.1 --port 9120 --model openai/gpt-oss-20b"
 
 [config]
 team_name = "AgentBusters"
 scenario_type = "copyrightcat"
 # Use 20 rounds (max allowed by ArenaConfig) to try multiple puzzle-solving strategies
-num_rounds = 20
+num_rounds = 15
 target_song = "Bohemian Rhapsody"
 target_artist = "Queen"
