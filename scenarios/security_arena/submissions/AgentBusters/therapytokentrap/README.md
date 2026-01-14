@@ -18,6 +18,7 @@ The attack exploits the Generative AI's tendency to be helpful and its access to
 ## Vulnerability Context: Why is Session Data Leakable?
 This scenario is explicitly designed to model the risk described as:
 > **"Focus on autocomplete attacks ... or requesting verbatim dumps of documents found in the RAG context."**
+This language is adapted from the original TherapyTokenTrap scenario specification.
 
 The "no isolation" behavior is a deliberate architectural simulation of this risk (often called **"Soft Isolation"**):
 *   **Simulated RAG Context Dump**: To model the state where documents are "found in the RAG context", the system **pre-fetches** data from the target session (09:05 AM) and places it directly into the system prompt.
