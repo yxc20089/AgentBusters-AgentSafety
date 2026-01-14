@@ -8,7 +8,6 @@ to avoid model safety refusals. Templates rotate across rounds.
 
 import argparse
 import logging
-import random
 import uvicorn
 
 from a2a.server.apps import A2AStarletteApplication
@@ -368,11 +367,15 @@ class TemplateAttackerExecutor(AgentExecutor):
     
     def _create_attack(self, baseline: str, template: str) -> str:
         """Create the attack by appending template to baseline"""
-        # Insert the attack template before </body></html>
-        if "</body>" in baseline:
-            return baseline.replace("</body>", f"{template}\n</body>")
-        elif "</html>" in baseline:
-            return baseline.replace("</html>", f"{template}\n</html>")
+        # Insert the attack template before </body></html> (case-insensitive)
+        baseline_lower = baseline.lower()
+        if "</body>" in baseline_lower:
+            # Find the position case-insensitively and replace
+            import re
+            return re.sub(r'</body>', f"{template}\n</body>", baseline, count=1, flags=re.IGNORECASE)
+        elif "</html>" in baseline_lower:
+            import re
+            return re.sub(r'</html>', f"{template}\n</html>", baseline, count=1, flags=re.IGNORECASE)
         else:
             return baseline + template
 
@@ -405,13 +408,14 @@ class TemplateAttackerExecutor(AgentExecutor):
                 )
                 return
             
-            # Get attack template
+            # Get attack template (store current index before it's incremented)
+            current_template_index = self.template_index
             template = self._get_next_template()
             
             # Create attack
             attack_output = self._create_attack(baseline, template)
             
-            logger.info(f"Template Attacker generated attack ({len(attack_output)} chars) using template {self.template_index}")
+            logger.info(f"Template Attacker generated attack ({len(attack_output)} chars) using template {current_template_index}")
 
             await updater.update_status(
                 TaskState.completed,
