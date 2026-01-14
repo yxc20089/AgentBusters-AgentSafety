@@ -15,7 +15,7 @@ cmd = "python scenarios/security_arena/agents/generic_defender.py --host 127.0.0
 [config]
 scenario_type = "stockbotspoof"
 plugin_file = "plugin.py"
-num_rounds = 20
+num_rounds = 15
 team_name = "AgentBusters"
 require_watermark = false
 
