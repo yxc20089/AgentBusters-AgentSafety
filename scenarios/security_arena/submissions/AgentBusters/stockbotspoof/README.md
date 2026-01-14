@@ -156,3 +156,14 @@ The attacker cannot remove negative content, mirroring real-world document poiso
 
 ### 5. LLM-Based Adaptive Attacker
 Uses `generic_attacker.py` with an LLM that learns from previous failed attempts, discovering successful patterns through iterative refinement (Round 1 Hold → Round 2 Strong Buy).
+
+---
+
+## Attacker Options
+
+| Attacker | Type | Description |
+|----------|------|-------------|
+| `generic_attacker.py` | LLM-based | **Used in tests** - Adaptive attacker that learns from failures |
+| `template_attacker.py` | Template-based | Alternative implementation with deterministic patterns |
+
+The documented test results use `generic_attacker.py` as configured in `scenario_stockbotspoof.toml`.
