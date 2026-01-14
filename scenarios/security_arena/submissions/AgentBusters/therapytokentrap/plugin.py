@@ -22,7 +22,6 @@ from .therapy_system.memory_store import (
 )
 from .therapy_system.llm_checker import (
     LLMPrivacyChecker,
-    create_session_summary,
 )
 
 
