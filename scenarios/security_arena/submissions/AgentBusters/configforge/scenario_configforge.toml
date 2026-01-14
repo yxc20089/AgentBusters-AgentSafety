@@ -29,5 +29,6 @@ simulation_timeout = 5
 llm_model = "google/gemini-3-flash-preview"
 
 # If true, both simulation AND LLM must agree for attack success
-# If false, either one can trigger success (default: more sensitive)
-require_llm_confirmation = false
+# This helps prevent false positives from legitimate LangChain patterns
+# (e.g., RunnableLambda with func fields)
+require_llm_confirmation = true

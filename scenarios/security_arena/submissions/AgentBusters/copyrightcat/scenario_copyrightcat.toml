@@ -8,10 +8,8 @@ cmd = "python scenarios/security_arena/orchestrator.py --host 127.0.0.1 --port 9
 [[participants]]
 role = "attacker"
 endpoint = "http://127.0.0.1:9121"
-# Use the CopyrightCat-specific attacker with puzzle-solving templates
-cmd = "python scenarios/security_arena/submissions/AgentBusters/copyrightcat/copyrightcat_attacker.py --host 127.0.0.1 --port 9121"
-# Alternative: use generic attacker with LLM-based dynamic attack generation (uses plugin.py's get_attack_objective)
-# cmd = "python scenarios/security_arena/agents/generic_attacker.py --host 127.0.0.1 --port 9121 --model openai/gpt-oss-20b"
+# Use generic attacker with LLM-based dynamic attack generation
+cmd = "python scenarios/security_arena/agents/generic_attacker.py --host 127.0.0.1 --port 9121 --model openai/gpt-oss-20b"
 
 [[participants]]
 role = "defender"
