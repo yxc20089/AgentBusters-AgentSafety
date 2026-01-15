@@ -28,16 +28,16 @@ temp_site_dir = tempfile.mkdtemp(prefix="httpx_patch_")
 usercustomize_content = '''
 import httpx
 
-EXTENDED_TIMEOUT = httpx.Timeout(3000.0, connect=3000.0, read=3000.0, write=3000.0)
+EXTENDED_TIMEOUT = httpx.Timeout(5000.0, connect=5000.0, read=5000.0, write=5000.0)
 
 def _should_extend_timeout(timeout_val):
     if timeout_val is None:
         return True
     if isinstance(timeout_val, (int, float)):
-        return timeout_val < 3000
+        return timeout_val < 5000
     if isinstance(timeout_val, httpx.Timeout):
         read_timeout = timeout_val.read
-        if read_timeout is not None and read_timeout < 3000:
+        if read_timeout is not None and read_timeout < 5000:
             return True
     return False
 
