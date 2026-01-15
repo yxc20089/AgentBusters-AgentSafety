@@ -80,7 +80,7 @@ os.environ["ENABLE_USER_SITE"] = "1"
 def cleanup():
     try:
         shutil.rmtree(temp_site_dir)
-    except:
+    except Exception:
         pass
 
 atexit.register(cleanup)
