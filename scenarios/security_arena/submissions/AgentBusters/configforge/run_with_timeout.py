@@ -97,10 +97,10 @@ def _should_extend_timeout(timeout_val):
     if timeout_val is None:
         return True
     if isinstance(timeout_val, (int, float)):
-        return timeout_val < 5000
+        return timeout_val < EXTENDED_TIMEOUT.read
     if isinstance(timeout_val, httpx.Timeout):
         read_timeout = timeout_val.read
-        if read_timeout is not None and read_timeout < 5000:
+        if read_timeout is not None and read_timeout < EXTENDED_TIMEOUT.read:
             return True
     return False
 
