@@ -26,6 +26,9 @@ num_rounds = 15
 simulation_timeout = 5
 
 # LLM Judge configuration
+# llm_backend: "vllm" for local vLLM, "openrouter" for OpenRouter API
+llm_backend = "vllm"
+
 # If using local vLLM: set to your model name (e.g., "openai/gpt-oss-20b")
 # If using OpenRouter: set to OpenRouter model (requires OPENROUTER_API_KEY in .env)
 llm_model = "openai/gpt-oss-20b"

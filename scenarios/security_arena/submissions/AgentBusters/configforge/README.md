@@ -150,6 +150,11 @@ The ConfigForge plugin is already registered in `plugins/registry.py`. To run:
 uv run agentbeats-run scenarios/security_arena/submissions/agentbusters/configforge/scenario_configforge.toml --show-logs
 ```
 
+> **Note**: If you're using `llm_backend = "vllm"` and experiencing timeouts, you can use the timeout wrapper script:
+> ```bash
+> python scenarios/security_arena/submissions/AgentBusters/configforge/run_with_timeout.py
+> ```
+
 This will:
 1. Start the green agent (orchestrator) on port 9010
 2. Start the attacker agent on port 9021

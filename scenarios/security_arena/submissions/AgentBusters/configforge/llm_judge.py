@@ -4,11 +4,14 @@ ConfigForge LLM Judge
 Uses local vLLM or OpenRouter API for semantic analysis of configuration security.
 Provides the "reasoning layer" that can detect attacks beyond pattern matching.
 
-Configuration via environment variables:
+Configuration:
+- backend: "vllm" for local vLLM, "openrouter" for OpenRouter API (set in scenario config)
+
+Environment variables:
 - OPENAI_BASE_URL: OpenAI-compatible API base URL (e.g., http://localhost:8000/v1)
 - VLLM_API_URL: Local vLLM endpoint (overrides OPENAI_BASE_URL)
 - VLLM_MODEL: Model name for local vLLM (default: gpt-oss-20b)
-- OPENROUTER_API_KEY: Fallback to OpenRouter if set and vLLM unavailable
+- OPENROUTER_API_KEY: Required when using OpenRouter backend
 """
 
 import json
@@ -99,9 +102,9 @@ class LLMJudge:
     Provides semantic analysis that can understand attack intent
     beyond simple pattern matching.
     
-    Priority:
-    1. Local vLLM (if VLLM_API_URL is set or default endpoint is reachable)
-    2. OpenRouter (if OPENROUTER_API_KEY is set)
+    Backend selection:
+    - "vllm": Use local vLLM endpoint
+    - "openrouter": Use OpenRouter API (requires OPENROUTER_API_KEY)
     """
 
     def __init__(
@@ -110,21 +113,21 @@ class LLMJudge:
         model: Optional[str] = None,
         timeout: float = 30.0,
         vllm_url: Optional[str] = None,
-        use_local_vllm: bool = True
+        backend: str = "vllm"
     ):
         """
         Initialize the LLM judge.
 
         Args:
             api_key: OpenRouter API key (defaults to OPENROUTER_API_KEY env var)
-            model: Model to use for analysis (auto-detected based on backend)
+            model: Model to use for analysis
             timeout: Request timeout in seconds
             vllm_url: Local vLLM API URL (defaults to VLLM_API_URL env var or localhost:8000)
-            use_local_vllm: Whether to try local vLLM first (default: True)
+            backend: "vllm" for local vLLM, "openrouter" for OpenRouter API
         """
         self.openrouter_api_key = api_key or os.environ.get("OPENROUTER_API_KEY")
         self.timeout = timeout
-        self.use_local_vllm = use_local_vllm
+        self.backend = backend.lower()
         
         # Configure vLLM endpoint - check multiple env vars for compatibility
         if vllm_url:
@@ -140,10 +143,8 @@ class LLMJudge:
         
         self.vllm_model = os.environ.get("VLLM_MODEL", DEFAULT_VLLM_MODEL)
         
-        # Determine which backend to use
-        self._using_vllm = False
-        if use_local_vllm:
-            self._using_vllm = self._check_vllm_available()
+        # Determine which backend to use based on explicit backend parameter
+        self._using_vllm = (self.backend == "vllm")
         
         # Set model based on backend
         if model:
@@ -152,6 +153,12 @@ class LLMJudge:
             self.model = self.vllm_model
         else:
             self.model = DEFAULT_OPENROUTER_MODEL
+        
+        # Log which backend is being used
+        if self._using_vllm:
+            print(f"Using local vLLM backend at {self.vllm_url}")
+        else:
+            print(f"Using OpenRouter backend with model {self.model}")
     
     def _get_base_url(self) -> str:
         """Extract base URL from the chat completions endpoint."""
@@ -192,8 +199,11 @@ class LLMJudge:
         return False
 
     def is_available(self) -> bool:
-        """Check if LLM judge is available (vLLM reachable or API key configured)."""
-        return self._using_vllm or bool(self.openrouter_api_key)
+        """Check if LLM judge is available based on configured backend."""
+        if self._using_vllm:
+            return self._check_vllm_available()
+        else:
+            return bool(self.openrouter_api_key)
 
     def judge(
         self,
@@ -376,35 +386,41 @@ def create_judge(
     api_key: Optional[str] = None,
     model: Optional[str] = None,
     vllm_url: Optional[str] = None,
-    use_local_vllm: bool = True,
+    backend: str = "vllm",
 ) -> LLMJudge:
     """
     Factory function to create LLM judge.
 
     Args:
         api_key: OpenRouter API key (defaults to OPENROUTER_API_KEY env var)
-        model: Model to use (auto-detected based on backend if not specified)
+        model: Model to use
         vllm_url: Local vLLM API URL
-        use_local_vllm: Whether to try local vLLM first (default: True)
+        backend: "vllm" for local vLLM, "openrouter" for OpenRouter API
 
     Returns:
         LLMJudge instance
 
     Raises:
-        ValueError: If neither vLLM nor OpenRouter is available
+        ValueError: If the configured backend is not available
     """
     judge = LLMJudge(
         api_key=api_key,
         model=model,
         vllm_url=vllm_url,
-        use_local_vllm=use_local_vllm
+        backend=backend
     )
 
     if not judge.is_available():
-        raise ValueError(
-            "No LLM backend available. Either:\n"
-            "1. Start local vLLM: vllm serve gpt-oss-20b --port 8000\n"
-            "2. Set OPENROUTER_API_KEY environment variable"
-        )
+        if backend.lower() == "vllm":
+            raise ValueError(
+                "vLLM backend not available. Either:\n"
+                "1. Start local vLLM: vllm serve gpt-oss-20b --port 8000\n"
+                "2. Set llm_backend = 'openrouter' in scenario config"
+            )
+        else:
+            raise ValueError(
+                "OpenRouter backend not available.\n"
+                "Set OPENROUTER_API_KEY environment variable."
+            )
 
     return judge

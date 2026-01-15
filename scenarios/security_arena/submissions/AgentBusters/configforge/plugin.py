@@ -62,6 +62,7 @@ class ConfigForgePlugin(ScenarioPlugin):
         # Configuration
         self.simulation_timeout = config.get("simulation_timeout", 5)
         self.llm_model = config.get("llm_model", "anthropic/claude-3.5-sonnet")
+        self.llm_backend = config.get("llm_backend", "vllm")  # "vllm" or "openrouter"
         self.require_llm_confirmation = config.get("require_llm_confirmation", False)
 
         # Components
@@ -73,7 +74,7 @@ class ConfigForgePlugin(ScenarioPlugin):
     def judge(self) -> LLMJudge:
         """Lazy initialization of LLM judge."""
         if self._judge is None:
-            self._judge = create_judge(model=self.llm_model)
+            self._judge = create_judge(model=self.llm_model, backend=self.llm_backend)
         return self._judge
 
     def get_scenario_name(self) -> str:
