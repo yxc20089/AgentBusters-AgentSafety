@@ -8,9 +8,9 @@ cmd = "python scenarios/security_arena/orchestrator.py --host 127.0.0.1 --port 9
 [[participants]]
 role = "attacker"
 endpoint = "http://127.0.0.1:9221"
-# Option 1: Template-based attacker with fixed puzzle-solving attacks (ACTIVE)
+# Option 1: Template-based attacker with fixed puzzle-solving attacks (DISABLED)
 # cmd = "python scenarios/security_arena/submissions/AgentBusters/copyrightcat/template_attacker.py --host 127.0.0.1 --port 9221"
-# Option 2: Generic LLM-based dynamic attack generation (DISABLED)
+# Option 2: Generic LLM-based dynamic attack generation (ACTIVE)
 cmd = "python scenarios/security_arena/agents/generic_attacker.py --host 127.0.0.1 --port 9221 --model openai/gpt-oss-20b"
 
 [[participants]]
