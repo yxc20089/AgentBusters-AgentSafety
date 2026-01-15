@@ -5,7 +5,8 @@ Uses local vLLM or OpenRouter API for semantic analysis of configuration securit
 Provides the "reasoning layer" that can detect attacks beyond pattern matching.
 
 Configuration via environment variables:
-- VLLM_API_URL: Local vLLM endpoint (default: http://127.0.0.1:8000/v1/chat/completions)
+- OPENAI_BASE_URL: OpenAI-compatible API base URL (e.g., http://localhost:8000/v1)
+- VLLM_API_URL: Local vLLM endpoint (overrides OPENAI_BASE_URL)
 - VLLM_MODEL: Model name for local vLLM (default: gpt-oss-20b)
 - OPENROUTER_API_KEY: Fallback to OpenRouter if set and vLLM unavailable
 """
@@ -20,8 +21,8 @@ from .models import SecurityJudgment, SimulationResult
 
 
 # Local vLLM configuration
-DEFAULT_VLLM_API_URL = "http://127.0.0.1:8000/v1/chat/completions"
-DEFAULT_VLLM_MODEL = "gpt-oss-20b"
+DEFAULT_VLLM_API_URL = "http://localhost:8000/v1/chat/completions"
+DEFAULT_VLLM_MODEL = "openai/gpt-oss-20b"
 
 # OpenRouter configuration (fallback)
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -125,8 +126,18 @@ class LLMJudge:
         self.timeout = timeout
         self.use_local_vllm = use_local_vllm
         
-        # Configure vLLM endpoint
-        self.vllm_url = vllm_url or os.environ.get("VLLM_API_URL", DEFAULT_VLLM_API_URL)
+        # Configure vLLM endpoint - check multiple env vars for compatibility
+        if vllm_url:
+            self.vllm_url = vllm_url
+        elif os.environ.get("VLLM_API_URL"):
+            self.vllm_url = os.environ.get("VLLM_API_URL")
+        elif os.environ.get("OPENAI_BASE_URL"):
+            # Use OPENAI_BASE_URL for compatibility with other components
+            base_url = os.environ.get("OPENAI_BASE_URL").rstrip("/")
+            self.vllm_url = f"{base_url}/chat/completions"
+        else:
+            self.vllm_url = DEFAULT_VLLM_API_URL
+        
         self.vllm_model = os.environ.get("VLLM_MODEL", DEFAULT_VLLM_MODEL)
         
         # Determine which backend to use
@@ -142,11 +153,22 @@ class LLMJudge:
         else:
             self.model = DEFAULT_OPENROUTER_MODEL
     
+    def _get_base_url(self) -> str:
+        """Extract base URL from the chat completions endpoint."""
+        url = self.vllm_url
+        # Remove /chat/completions or /v1/chat/completions suffix
+        for suffix in ["/v1/chat/completions", "/chat/completions"]:
+            if url.endswith(suffix):
+                return url[:-len(suffix)]
+        return url.rstrip("/")
+    
     def _check_vllm_available(self) -> bool:
         """Check if local vLLM endpoint is reachable."""
+        base_url = self._get_base_url()
+        
+        # Try health endpoint first
         try:
-            # Try to reach the vLLM health endpoint
-            health_url = self.vllm_url.replace("/v1/chat/completions", "/health")
+            health_url = f"{base_url}/health"
             with httpx.Client(timeout=2.0) as client:
                 response = client.get(health_url)
                 if response.status_code == 200:
@@ -155,9 +177,9 @@ class LLMJudge:
         except Exception:
             pass
         
-        # Also try the models endpoint as fallback
+        # Try models endpoint as fallback
         try:
-            models_url = self.vllm_url.replace("/chat/completions", "/models")
+            models_url = f"{base_url}/v1/models"
             with httpx.Client(timeout=2.0) as client:
                 response = client.get(models_url)
                 if response.status_code == 200:
@@ -166,7 +188,7 @@ class LLMJudge:
         except Exception:
             pass
         
-        print(f"Local vLLM not available, falling back to OpenRouter")
+        print(f"Local vLLM not available at {base_url}, falling back to OpenRouter")
         return False
 
     def is_available(self) -> bool:
@@ -302,12 +324,37 @@ class LLMJudge:
             return response.json()
 
     def _parse_response(self, response: dict) -> Optional[SecurityJudgment]:
-        """Parse OpenRouter response into SecurityJudgment."""
+        """Parse LLM response into SecurityJudgment."""
         try:
-            content = response["choices"][0]["message"]["content"]
-
+            message = response["choices"][0]["message"]
+            
+            # Try different content fields - vLLM may use reasoning_content
+            content = message.get("content")
+            if not content:
+                content = message.get("reasoning_content")
+            if not content:
+                # Try to get from reasoning field
+                content = message.get("reasoning")
+            
+            if not content:
+                print(f"LLM response has no content. Message: {message}")
+                return None
+            
+            # Try to extract JSON from content (may be wrapped in markdown code blocks)
+            json_str = content
+            if "```json" in content:
+                start = content.find("```json") + 7
+                end = content.find("```", start)
+                if end > start:
+                    json_str = content[start:end].strip()
+            elif "```" in content:
+                start = content.find("```") + 3
+                end = content.find("```", start)
+                if end > start:
+                    json_str = content[start:end].strip()
+            
             # Parse JSON from response
-            judgment_data = json.loads(content)
+            judgment_data = json.loads(json_str)
 
             # Validate and create SecurityJudgment
             return SecurityJudgment(
@@ -319,6 +366,9 @@ class LLMJudge:
             )
         except (KeyError, json.JSONDecodeError, ValueError) as e:
             print(f"Failed to parse LLM response: {e}")
+            # Print more debug info
+            if "choices" in response:
+                print(f"Response message: {response['choices'][0].get('message', {})}")
             return None
 
 
