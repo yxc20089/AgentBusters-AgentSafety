@@ -338,12 +338,16 @@ class LLMJudge:
         try:
             message = response["choices"][0]["message"]
             
-            # Try different content fields - vLLM may use reasoning_content
+            # Different LLM backends structure responses differently:
+            # - OpenAI-compatible / some OpenRouter models put the main answer in "content"
+            # - Some vLLM setups expose the final JSON in "reasoning_content"
+            # - Other backends (or configurations) may expose reasoning/answer text in "reasoning"
+            # We deliberately fall back across these fields to support multiple backends without
+            # changing the core parsing logic.
             content = message.get("content")
             if not content:
                 content = message.get("reasoning_content")
             if not content:
-                # Try to get from reasoning field
                 content = message.get("reasoning")
             
             if not content:
