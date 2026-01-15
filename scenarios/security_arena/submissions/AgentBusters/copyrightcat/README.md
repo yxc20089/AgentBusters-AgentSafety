@@ -120,7 +120,8 @@ export OPENAI_API_KEY="your-key"
 export OPENAI_BASE_URL="http://localhost:8000/v1"  # For local vLLM
 
 # Run the CopyrightCat scenario
-uv run agentbeats-run scenarios/security_arena/submissions/AgentBusters/copyrightcat/scenario_copyrightcat.toml
+pip install -e .
+agentbeats-run --show-logs scenarios/security_arena/submissions/AgentBusters/copyrightcat/scenario_copyrightcat.toml
 
 # View results
 cat results/AgentBusters/copyrightcat/*/result.json
