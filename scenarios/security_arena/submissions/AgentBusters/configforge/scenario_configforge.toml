@@ -2,18 +2,18 @@
 # Unsafe Structured Output via Serialization Injection
 
 [green_agent]
-endpoint = "http://127.0.0.1:9010"
-cmd = "python scenarios/security_arena/orchestrator.py --host 127.0.0.1 --port 9010"
+endpoint = "http://127.0.0.1:9110"
+cmd = "python scenarios/security_arena/orchestrator.py --host 127.0.0.1 --port 9110"
 
 [[participants]]
 role = "attacker"
-endpoint = "http://127.0.0.1:9021"
-cmd = "python scenarios/security_arena/agents/generic_attacker.py --host 127.0.0.1 --port 9021 --model openai/gpt-oss-20b"
+endpoint = "http://127.0.0.1:9121"
+cmd = "python scenarios/security_arena/agents/generic_attacker.py --host 127.0.0.1 --port 9121 --model openai/gpt-oss-20b"
 
 [[participants]]
 role = "defender"
-endpoint = "http://127.0.0.1:9020"
-cmd = "python scenarios/security_arena/agents/generic_defender.py --host 127.0.0.1 --port 9020 --model openai/gpt-oss-20b"
+endpoint = "http://127.0.0.1:9120"
+cmd = "python scenarios/security_arena/agents/generic_defender.py --host 127.0.0.1 --port 9120 --model openai/gpt-oss-20b"
 
 [config]
 # Team and scenario identifiers
