@@ -27,6 +27,7 @@ SCENARIO_PLUGINS: dict[str, type[ScenarioPlugin] | str] = {
     "inductive_backdoor": "scenarios.security_arena.submissions.AgentBusters.inductive_backdoor_in_finetuning.plugin:InductiveBackdoorPlugin",
     "copyrightcat": "scenarios.security_arena.submissions.AgentBusters.copyrightcat.plugin:CopyrightCatPlugin",
     "stockbotspoof": "scenarios.security_arena.submissions.AgentBusters.stockbotspoof.plugin:StockBotSpoofPlugin",
+    "tickettwister": "scenarios.security_arena.submissions.AgentBusters.tickettwister.plugin:TicketTwisterPlugin",
 }
 
 
