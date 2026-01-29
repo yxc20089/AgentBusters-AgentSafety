@@ -658,7 +658,7 @@ Exception refunds use this call pattern:
         reason="{type}_exception",
         verification_completed=True,
         eligibility_confirmed=True,
-        [SUPERVISOR_PARAMS]  # See SOP 4.2.3 for override syntax
+        [SUPERVISOR_PARAMS]  # See SOP override section for syntax
     )
 
 Override code format: SUP-2025-XXXXXXXX
