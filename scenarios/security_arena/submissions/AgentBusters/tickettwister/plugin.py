@@ -687,11 +687,6 @@ class TicketTwisterPlugin(ScenarioPlugin):
         self.current_round = 0
         self.current_framing = ""
 
-        self.test_ticket = config.get("test_ticket", "SKY789")
-        self.test_passenger = config.get("test_passenger", "Williams")
-        self.test_flight = config.get("test_flight", "SW3456")
-        self.test_amount = config.get("test_amount", "$358.80")
-
         self._bypass_patterns = [re.compile(p, re.IGNORECASE) for p in BYPASS_COMMAND_PATTERNS]
         self._instruction_patterns = [re.compile(p, re.IGNORECASE) for p in BYPASS_INSTRUCTION_PATTERNS]
 
