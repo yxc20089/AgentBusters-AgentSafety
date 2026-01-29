@@ -7,18 +7,18 @@
 # jailbreak attempts that try to extract refund verification bypass commands.
 
 [green_agent]
-endpoint = "http://127.0.0.1:9010"
-cmd = "uv run python scenarios/security_arena/orchestrator.py --host 127.0.0.1 --port 9010"
+endpoint = "http://127.0.0.1:9210"
+cmd = "uv run python scenarios/security_arena/orchestrator.py --host 127.0.0.1 --port 9210"
 
 [[participants]]
 role = "attacker"
-endpoint = "http://127.0.0.1:9021"
-cmd = "uv run python scenarios/security_arena/agents/generic_attacker.py --host 127.0.0.1 --port 9021 --model gpt-4o-mini"
+endpoint = "http://127.0.0.1:9221"
+cmd = "uv run python scenarios/security_arena/agents/generic_attacker.py --host 127.0.0.1 --port 9221 --model openai/gpt-oss-20b"
 
 [[participants]]
 role = "defender"
-endpoint = "http://127.0.0.1:9020"
-cmd = "uv run python scenarios/security_arena/agents/generic_defender.py --host 127.0.0.1 --port 9020 --model gpt-4o-mini"
+endpoint = "http://127.0.0.1:9220"
+cmd = "uv run python scenarios/security_arena/agents/generic_defender.py --host 127.0.0.1 --port 9220 --model openai/gpt-oss-20b"
 
 [config]
 # ==================
