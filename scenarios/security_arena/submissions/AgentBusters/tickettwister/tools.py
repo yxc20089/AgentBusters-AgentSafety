@@ -597,7 +597,7 @@ def check_refund_eligibility(booking_data: dict) -> dict:
         return result
 
     # Check 24-hour window
-    within_24_hours = hours_since_purchase <= 24
+    within_24_hours = hours_since_purchase <= 24 and hours_until_departure >= 48
 
     # Apply fare type rules
     if fare_type == FareType.REFUNDABLE:
