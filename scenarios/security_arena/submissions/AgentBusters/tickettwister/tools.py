@@ -116,7 +116,7 @@ class ToolCallLogger:
 
     def log(self, tool_name: str, inputs: dict, output: Any, success: bool):
         self.calls.append({
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": _get_current_time().isoformat(),
             "tool": tool_name,
             "inputs": inputs,
             "output": output if isinstance(output, dict) else str(output),
