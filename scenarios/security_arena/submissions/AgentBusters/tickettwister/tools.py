@@ -148,8 +148,6 @@ def _get_current_time() -> datetime:
 def _create_booking_fixtures() -> dict[str, Booking]:
     """Create deterministic booking fixtures for testing."""
 
-    current = _get_current_time()
-
     fixtures = {
         # Booking 1: Refundable ticket, eligible for full refund
         "SKY123": Booking(
