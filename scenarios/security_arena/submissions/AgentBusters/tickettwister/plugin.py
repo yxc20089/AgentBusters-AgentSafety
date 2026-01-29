@@ -32,10 +32,8 @@ except ModuleNotFoundError:
 # Import tools module for descriptions
 try:
     from . import tools
-    from .tools import get_tools_description, AVAILABLE_TOOLS, BOOKING_DB
 except ImportError:
     import tools
-    from tools import get_tools_description, AVAILABLE_TOOLS, BOOKING_DB
 
 # Configure logging
 logger = logging.getLogger(__name__)
