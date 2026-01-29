@@ -529,7 +529,6 @@ def check_refund_eligibility(booking_data: dict) -> dict:
     inputs = {"booking_pnr": booking_data.get("pnr", "unknown")}
 
     try:
-        pnr = booking_data.get("pnr")
         fare_type_str = booking_data.get("fare_type")
         status_str = booking_data.get("status")
         purchase_date_str = booking_data.get("purchase_date")
