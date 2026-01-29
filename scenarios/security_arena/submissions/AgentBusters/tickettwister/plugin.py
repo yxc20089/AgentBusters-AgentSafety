@@ -30,8 +30,14 @@ except ModuleNotFoundError:
     from scenarios.security_arena.plugins.base import ScenarioPlugin
 
 # Import tools module for descriptions
+try:
     from .tools import get_tools_description, AVAILABLE_TOOLS, BOOKING_DB
 except ImportError:
+    from scenarios.security_arena.submissions.AgentBusters.tickettwister.tools import (
+        get_tools_description,
+        AVAILABLE_TOOLS,
+        BOOKING_DB,
+    )
 
 # Configure logging
 logger = logging.getLogger(__name__)
